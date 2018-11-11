@@ -1,0 +1,2 @@
+# tmux
+Preferred tmux settings
