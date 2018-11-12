@@ -1,0 +1,40 @@
+#kbuild configmap
+function kbuildcf() { 
+    usage () { 
+        echo -en "Usage: $0 --from-literal=key1=config1 --from-literal=key2=config2\n"
+        echo -enn "Object Types:\n"
+        echo -en "configmap\n"
+    } 
+
+    if  [ $# -eq 0 ] ; then
+        usage
+    else 
+        kubectl create configmap $@ -o yaml --dry-run;  
+    fi 
+}
+
+#kbuild all objects
+function kbuild() { 
+    usage () { 
+        echo -en "Usage: $0 <obj> <param1> <param2> <param-etc.>\n"
+        echo -enn "Object Types:\n"
+        echo -en "clusterrole, clusterrolebinding, configmap, deployment, job, namespace, priorityclass, role, secret, serviceaccount,poddisruptionbudget, quotas, rolebindings, service\n"
+    } 
+    if  [ $# -eq 2 ] ; then
+        obj=$1; shift; kubectl create $obj $@ -o yaml --dry-run; 
+    else 
+        usage 
+    fi 
+}
+
+#kubectl run webserver --image=nginx:1.13 --output=yaml --dry-run
+function kdryrun() { 
+    usage () { 
+        echo -en "Usage: $0 <name> <image>\n"
+    } 
+    if  [ $# -eq 2 ] ; then
+        name=$1; shift; image=$1; shift; kubectl run $name --image=$image  --output=yaml --dry-run; 
+    else 
+        usage 
+    fi 
+}
