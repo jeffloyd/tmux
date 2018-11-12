@@ -14,7 +14,17 @@ function klogs() { kubectl logs $*;}
 function kexec(){ pod=$1; shift; kubectl exec -it $pod -- $@; }
 
 #kubectl run webserver --image=nginx:1.13 --output=yaml --dry-run
-function kdryrun() { name=$1; shift; image=$1; shift; kubectl run $name --image=$image  --output=yaml --dry-run; }
+function kdryrun() { 
+    usage () { 
+        echo -en "Usage: $0 <name> <image>\n"
+    } 
+    if  [ $# -eq 2 ] ; then
+        name=$1; shift; image=$1; shift; kubectl run $name --image=$image  --output=yaml --dry-run; 
+    else 
+        usage 
+    fi 
+}
+
 # Execute into a container
 function kcsh () {
     if [ $# -eq 4 ]; then
