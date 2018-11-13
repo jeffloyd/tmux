@@ -23,7 +23,7 @@ function kcsh () {
 # build configmap
 function kbuildcf() { 
     usage () { 
-        echo -en "Usage: $0 --from-literal=key1=config1 --from-literal=key2=config2\n"
+        echo -en "Usage: $0 <name> --from-literal=key1=config1 --from-literal=key2=config2\n"
         echo -enn "Object Types:\n"
         echo -en "configmap\n"
     } 
@@ -31,7 +31,7 @@ function kbuildcf() {
     if  [ $# -eq 0 ] ; then
         usage
     else 
-        kubectl create configmap $@ -o yaml --dry-run;  
+        name=$1; shift; kubectl create configmap $name $@ -o yaml --dry-run;  
     fi 
 }
 
