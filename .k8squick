@@ -5,6 +5,25 @@ function sshgen() {
 #run a pod from a generator
 function krun() { name=$1; shift; image=$1; shift; kubectl run -it --generator=run-pod/v1 --image $image $name -- $@; }
 
+#Removing a Pod from a Service
+kubectl get pods -Lrun
+kubectl get endpoints
+
+function takepodoffline() {
+    name=$1; kubectl label pods $name run=notworking --overwrite
+}
+
+function findpodip() {
+    name=$1; kubectl get pods $name -o json | jq -r .status.podIP
+}
+function drainnode() {
+    name=$1; kubectl drain $name --ignore-daemonsets
+}
+function dumpstate() {
+    kubectl cluster-info dump --all-namespaces --output-directory=~/cluster-state;
+    tree ~/cluster-state;
+}
+
 #get kube logs
 function klogs() { kubectl logs $*;}
 
