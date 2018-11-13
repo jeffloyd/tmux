@@ -1,4 +1,26 @@
-#kbuild configmap
+#generate ssh key
+function sshgen() {
+    ssh-keygen -t rsa -C "jeffloyd@gmail.com"
+}
+#run a pod from a generator
+function krun() { name=$1; shift; image=$1; shift; kubectl run -it --generator=run-pod/v1 --image $image $name -- $@; }
+
+#get kube logs
+function klogs() { kubectl logs $*;}
+
+#execute into a pod
+function kexec(){ pod=$1; shift; kubectl exec -it $pod -- $@; }
+
+# Execute into a container
+function kcsh () {
+    if [ $# -eq 4 ]; then
+        kubectl exec -ti "${2}" -c "${3}" --namespace="${1}" -- "${4}"
+    else
+        echo "Usage: $0 <namespace> <pod> <container> <command>"
+    fi
+}
+
+# build configmap
 function kbuildcf() { 
     usage () { 
         echo -en "Usage: $0 --from-literal=key1=config1 --from-literal=key2=config2\n"
@@ -13,7 +35,7 @@ function kbuildcf() {
     fi 
 }
 
-#kbuild all objects
+#build all types of objects
 function kbuild() { 
     usage () { 
         echo -en "Usage: $0 <obj> <param1> <param2> <param-etc.>\n"
@@ -27,14 +49,52 @@ function kbuild() {
     fi 
 }
 
+#do a dry run and print out the image sample:
 #kubectl run webserver --image=nginx:1.13 --output=yaml --dry-run
 function kdryrun() { 
     usage () { 
-        echo -en "Usage: $0 <name> <image>\n"
+        echo -en "Usage: $0 <name> <image> - like webserver nginx1.13\n"
     } 
     if  [ $# -eq 2 ] ; then
         name=$1; shift; image=$1; shift; kubectl run $name --image=$image  --output=yaml --dry-run; 
     else 
         usage 
     fi 
+}
+
+function kcc () { 
+    usage () { 
+        echo -en "Usage: $0 <context> <namespace>\n"
+        echo -en "Usage: $0 show\n"
+ 
+    } 
+    result () { 
+        echo -en "-> Context: \e[96m$context\e[0m\n-> Namespace: \e[92m$namespace\n\e[0m" 
+    } 
+    if  [ $# -eq 0 ] ; then 
+        ## If no options, print the current context/cluster and namespace 
+        context="$(kubectl config current-context 2>/dev/null)" 
+        namespace="$(kubectl config view -o "jsonpath={.contexts[?(@.name==\"$context\")].context.namespace}")" 
+        result 
+    elif [ $# -eq 1 ]; then 
+         ## If no options, print the current context/cluster and namespace
+        context="$(kubectl config get-contexts 2>/dev/null)"
+        result
+    elif [ $# -eq 2 ]; then 
+        ## If options, assume time to set 
+        context="$1" 
+        namespace="$2" 
+        kubectl config use-context "$context" > /dev/null 
+        kubectl config set-context "$context" --namespace="$namespace" > /dev/null 
+        result 
+    else 
+        usage 
+    fi 
+} 
+
+# quickly terminate stuck pods
+function kfp () {
+        for ns in $(kubectl get ns --no-headers | cut -d " " -f1); do
+                kubectl get pods --namespace="${ns}" | grep 'CrashLoopBackOff\|Error\|Terminating\|ImagePullBackOff\|Pending\|ErrImagePull\|Unknown' | cut -d " " -f 1 | xargs -n 1 kubectl delete pod --namespace="${ns}" --grace-period=0 --force
+        done
 }
