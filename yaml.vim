@@ -12,6 +12,7 @@ let b:did_indent = 1
 setlocal autoindent ts=2 sts=2 sw=2 et
 setlocal indentexpr=GetYamlIndent()
 setlocal indentkeys=o,O,*<Return>,!^F
+set filetype=yaml foldmethod=indent
 
 function! GetYamlIndent()
   let prevlnum = v:lnum - 1
