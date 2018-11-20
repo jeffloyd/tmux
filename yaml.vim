@@ -9,7 +9,7 @@ endif
 "unlet! b:did_indent
 let b:did_indent = 1
 
-setlocal autoindent sw=2 et
+setlocal autoindent ts=2 sts=2 sw=2 et
 setlocal indentexpr=GetYamlIndent()
 setlocal indentkeys=o,O,*<Return>,!^F
 
@@ -37,5 +37,5 @@ endfunction
 " vim:set sw=2:
 
 " add yaml stuffs
-au! BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml foldmethod=indent
-autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+# au! BufNewFile,BufReadPost *.{yaml,yml} set filetype=yaml foldmethod=indent
+# autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
