@@ -2,7 +2,9 @@
 Preferred tmux settings
 
 For vim, login to vim and :source ~/tumx/yaml.vim
+
 For k alias, source .k8settings 
+
 
 Command Editing Shortcuts
 Ctrl + a – go to the start of the command line
